@@ -113,14 +113,18 @@ public class EventController {
         Event event = result.get();
         model.addAttribute("title", "Add Tag to: " + event.getName());
         model.addAttribute("tags", tagRepository.findAll());
-        model.addAttribute("event", event);
-        model.addAttribute("eventTag", new EventTagDTO()); //uses model binding with event tag dto
+        EventTagDTO eventTag = new EventTagDTO();
+        eventTag.setEvent(event);
+        model.addAttribute("eventTag", eventTag);
         return "events/add-tag.html";
     }
 
     @PostMapping("add-tag")
-    public String processAddTagForm(@ModelAttribute @Valid EventTagDTO eventTag, Model model, Errors errors){
-        if(!errors.hasErrors()){
+    public String processAddTagForm(@ModelAttribute @Valid EventTagDTO eventTag,
+                                    Errors errors,
+                                    Model model){
+
+        if (!errors.hasErrors()) {
             Event event = eventTag.getEvent();
             Tag tag = eventTag.getTag();
             if (!event.getTags().contains(tag)){
@@ -129,6 +133,7 @@ public class EventController {
             }
             return "redirect:detail?eventId=" + event.getId();
         }
+
         return "redirect:add-tag";
     }
 
